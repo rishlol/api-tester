@@ -1,6 +1,6 @@
 # API Tester
 
-A lightweight browser-based HTTP request builder — a mini Postman built with vanilla TypeScript and Vite.
+A lightweight HTTP request builder — a mini Postman built with vanilla TypeScript and Vite. Runs as a web app or as a native desktop app via Tauri.
 
 ## Features
 
@@ -16,9 +16,11 @@ A lightweight browser-based HTTP request builder — a mini Postman built with v
   - Raw view for plain text responses
   - Headers table listing all response headers
   - One-click copy to clipboard
-- CORS-aware error messages with actionable hints
+- **No CORS restrictions** when running as the desktop app (requests go through Tauri's native Rust HTTP client)
 
 ## Getting Started
+
+### Web (browser)
 
 ```bash
 bun install
@@ -27,16 +29,31 @@ bun run dev
 
 Open [http://localhost:5173](http://localhost:5173) in your browser.
 
+> Note: browser requests are subject to CORS restrictions. Test against local APIs or APIs that explicitly allow cross-origin requests.
+
+### Desktop app (Tauri)
+
+Requires the [Rust toolchain](https://rustup.rs) and Xcode Command Line Tools (macOS).
+
+```bash
+bun install
+bun run tauri:dev     # opens the native window, hot-reloads on save
+bun run tauri:build   # produces a .app / .dmg in src-tauri/target/release/bundle
+```
+
 ## Scripts
 
-| Command           | Description                     |
-|-------------------|---------------------------------|
-| `bun run dev`     | Start local dev server          |
-| `bun run build`   | Type-check and build for prod   |
-| `bun run preview` | Preview the production build    |
+| Command               | Description                                  |
+|-----------------------|----------------------------------------------|
+| `bun run dev`         | Start Vite dev server (web)                  |
+| `bun run build`       | Type-check and build frontend for production |
+| `bun run preview`     | Preview the production web build             |
+| `bun run tauri:dev`   | Launch the desktop app in development mode   |
+| `bun run tauri:build` | Build and bundle the desktop app             |
 
 ## Tech Stack
 
+- [Tauri v2](https://tauri.app) — native desktop wrapper (Rust + system WebView)
 - [Vite](https://vite.dev) — build tool and dev server
 - Vanilla TypeScript — no framework, no runtime dependencies
 - CSS custom properties for theming
@@ -44,7 +61,3 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 ## Built with
 
 Developed using [Cursor](https://cursor.com) (AI-assisted IDE).
-
-## Notes
-
-Requests are sent directly from the browser via `fetch`. Some public APIs block cross-origin requests (CORS). For the best experience, test against local APIs or APIs that explicitly allow browser requests (e.g. `jsonplaceholder.typicode.com`).

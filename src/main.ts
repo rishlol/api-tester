@@ -678,6 +678,22 @@ function bindEvents() {
   }
 }
 
+// ─── Fetch helper ──────────────────────────────────────────────────────────────
+// When running inside Tauri, requests go through the native Rust HTTP client,
+// which bypasses browser CORS restrictions entirely.
+
+function isTauri(): boolean {
+  return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+}
+
+async function appFetch(url: string, init?: RequestInit): Promise<Response> {
+  if (isTauri()) {
+    const { fetch: tauriFetch } = await import('@tauri-apps/plugin-http');
+    return tauriFetch(url, init) as unknown as Response;
+  }
+  return fetch(url, init);
+}
+
 // ─── Send Request ──────────────────────────────────────────────────────────────
 
 async function sendRequest() {
@@ -731,7 +747,7 @@ async function sendRequest() {
   const start = performance.now();
 
   try {
-    const res = await fetch(url, {
+    const res = await appFetch(url, {
       method:  state.method,
       headers,
       body,
